@@ -49,7 +49,14 @@ int main()
     constexpr int screen_height = 720;
 
     auto settings = settings_manager();
-    auto gui = gui_manager(1270, settings.get_colors());
+    const auto& colors = settings.get_colors();
+    auto gui = gui_manager(
+        1270,
+        std::vector(
+            std::begin(colors),
+            std::end(colors)
+        )
+    );
 
     Color current_color = settings.get_colors().front();
     std::size_t color_index = 0;

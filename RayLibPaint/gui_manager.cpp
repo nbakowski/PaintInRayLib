@@ -5,11 +5,11 @@
 #include "gui_manager.h"
 
 #include <format>
-#include <array>
+#include <vector>
 #include <optional>
 #include <tuple>
 
-gui_manager::gui_manager(const int width, const std::array<Color, 7>& colors) 
+gui_manager::gui_manager(const int width, const std::vector<Color>& colors)
 	: colors_(colors), window_width_(width)
 {
     int position_x = 15;

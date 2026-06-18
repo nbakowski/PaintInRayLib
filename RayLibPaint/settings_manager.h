@@ -1,7 +1,9 @@
 ﻿//
 // Created by Nikodem Bąkowski on 18/06/2026.
 //
-#pragma once
+#ifndef SETTINGS_MANAGER_H
+#define SETTINGS_MANAGER_H
+
 #include <array>
 #include <vector>
 #include <raylib.h>
@@ -24,3 +26,4 @@ public:
     [[nodiscard]] const std::vector<circle_positions>& get_circle_positions() const;
     [[nodiscard]] const std::array<Color, 7>& get_colors() const;
 };
+#endif
