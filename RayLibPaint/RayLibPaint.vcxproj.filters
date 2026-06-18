@@ -18,15 +18,15 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\PaintInRayLib\gui_manager.h">
+    <ClInclude Include="gui_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\PaintInRayLib\gui_manager.cpp">
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\PaintInRayLib\main.cpp">
+    <ClCompile Include="gui_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

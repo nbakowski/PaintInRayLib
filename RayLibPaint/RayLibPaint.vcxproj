@@ -142,11 +142,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\PaintInRayLib\gui_manager.h" />
+    <ClInclude Include="gui_manager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\PaintInRayLib\gui_manager.cpp" />
-    <ClCompile Include="..\..\PaintInRayLib\main.cpp" />
+    <ClCompile Include="gui_manager.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
