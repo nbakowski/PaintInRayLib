@@ -3,35 +3,44 @@
 
 #include <vector>
 #include <array>
+#include <format>
 #include <optional>
+
+#include "settings_manager.h"
 
 constexpr auto min_window_width = 800;
 constexpr auto min_window_height = 600;
 
-static void draw_brush_at_mouse_position(const int x, const int y, const float radius, const Color color)
+namespace
 {
-    if (ColorIsEqual(color, WHITE))
+    void draw_brush_at_mouse_position(const int x, const int y, const float radius, const Color color)
     {
-        DrawCircleLines(x, y, radius, BLACK);
-    }
-    DrawCircle(x, y, radius, color);
-}
-
-static std::optional<std::tuple<Color, int>> check_for_toolbar_actions(const int x, const int y, gui_manager& g)
-{
-    if (y <= toolbar_height)
-    {
-        ShowCursor();
-        if (g.get_color_from_toolbar(x, y) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        if (ColorIsEqual(color, WHITE))
         {
-            return g.get_color_from_toolbar(x, y).value();
+            DrawCircleLines(x, y, radius, BLACK);
         }
+        DrawCircle(x, y, radius, color);
     }
-    else
+
+    std::optional<std::tuple<Color, int>> check_for_toolbar_actions(const int x, const int y, gui_manager& g)
     {
-        HideCursor();
+        if (y <= toolbar_height)
+        {
+            ShowCursor();
+            if (
+                auto return_color = g.get_color_from_toolbar(x, y);
+                return_color.has_value() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)
+                )
+            {
+                return return_color;
+            }
+        }
+        else
+        {
+            HideCursor();
+        }
+        return std::nullopt;
     }
-    return std::nullopt;
 }
 
 int main()
@@ -39,9 +48,10 @@ int main()
     constexpr int screen_width = 1270;
     constexpr int screen_height = 720;
 
-    auto gui = gui_manager(1270);
+    auto settings = settings_manager();
+    auto gui = gui_manager(1270, settings.get_colors());
 
-    Color current_color = gui.get_colors().front();
+    Color current_color = settings.get_colors().front();
     std::size_t color_index = 0;
 
     // ReSharper disable once CppTooWideScope
@@ -60,8 +70,8 @@ int main()
 
     while (!WindowShouldClose())
     {
-        const int mouseX = GetMouseX();
-        const int mouseY = GetMouseY();
+        const int mouse_x = GetMouseX();
+        const int mouse_y = GetMouseY();
         const float current_brush_size = brush_sizes.at(brush_size_index);
 
         if (current_width != GetScreenWidth())
@@ -74,7 +84,7 @@ int main()
 
         ClearBackground(WHITE);
 
-        if (auto color_and_index = check_for_toolbar_actions(mouseX, mouseY, gui))
+        if (auto color_and_index = check_for_toolbar_actions(mouse_x, mouse_y, gui))
         {
             current_color = std::get<0>(color_and_index.value());
             color_index = std::get<1>(color_and_index.value());
@@ -82,7 +92,7 @@ int main()
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && IsCursorHidden())
         {
-            gui.draw_circle_on_canvas(mouseX, mouseY, current_color, current_brush_size);
+            settings.draw_circle_on_canvas(mouse_x, mouse_y, current_color, current_brush_size);
         }
 
         // Change the brush size
@@ -98,20 +108,20 @@ int main()
 
         // Cycle through colors with middle mouse button, really cool!
         if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
-            color_index = (color_index + 1) % gui.get_colors().size();
-            current_color = gui.get_colors().at(color_index);
+            color_index = (color_index + 1) % settings.get_colors().size();
+            current_color = settings.get_colors().at(color_index);
         }
 
-        if (IsKeyPressed(KEY_C)) { gui.clear_canvas(); }
+        if (IsKeyPressed(KEY_C)) { settings.clear_canvas(); }
 
         // Draw the buffer for previously drawn circles
-        for (const auto& [x, y, color, radius] : gui.get_circle_positions())
+        for (const auto& [x, y, color, radius] : settings.get_circle_positions())
         {
             DrawCircle(x, y, radius, color);
         }
 
         // Draw the brush
-        draw_brush_at_mouse_position(mouseX, mouseY, current_brush_size, current_color);
+        draw_brush_at_mouse_position(mouse_x, mouse_y, current_brush_size, current_color);
         gui.draw_toolbar(color_index, brush_sizes.at(brush_size_index));
 
         EndDrawing();

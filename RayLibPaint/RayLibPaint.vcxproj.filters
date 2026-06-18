@@ -21,12 +21,18 @@
     <ClInclude Include="gui_manager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="settings_manager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="gui_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="settings_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -9,38 +9,23 @@
 #include <optional>
 #include <tuple>
 
-gui_manager::gui_manager(const int width) : window_width_(width)
+gui_manager::gui_manager(const int width, const std::array<Color, 7>& colors) 
+	: colors_(colors), window_width_(width)
 {
     int position_x = 15;
     for (const Color color : colors_)
     {
         constexpr int size = 50;
         constexpr int position_y = 15;
-        color_square_positions_.push_back({ position_x, position_y, size, color });
+        color_square_positions_.push_back({ 
+			.x = position_x, 
+        	.y = position_y, 
+        	.size = size, 
+        	.color =  color});
         position_x += 65;
     }
 
     color_square_bar_size_ = position_x;
-}
-
-const std::array<Color, 7>& gui_manager::get_colors() const
-{
-    return colors_;
-}
-
-void gui_manager::draw_circle_on_canvas(const int x, const int y, const Color color, const float radius)
-{
-    circle_positions_.push_back({ x, y, color, radius });
-}
-
-void gui_manager::clear_canvas()
-{
-    circle_positions_.clear();
-}
-
-const std::vector<gui_manager::circle_positions>& gui_manager::get_circle_positions() const
-{
-    return circle_positions_;
 }
 
 void gui_manager::draw_toolbar(const std::size_t selected_color, const float brush_size) const
