@@ -8,7 +8,7 @@
 #include <raylib.h>
 #include <vector>
 
-static int toolbar_height = 80;
+inline constexpr int toolbar_height = 80;
 
 class gui_manager
 {
@@ -26,9 +26,15 @@ class gui_manager
     std::vector<color_square_positions> color_square_positions_;
 
 public:
+    struct color_pick_result
+    {
+        Color color;
+        int index;
+    };
+
     explicit gui_manager(int width, const std::vector<Color>& colors);
     void draw_toolbar(std::size_t selected_color, float brush_size) const;
-    std::optional<std::tuple<Color, int>> get_color_from_toolbar(int x, int y);
+    std::optional<color_pick_result> get_color_from_toolbar(int x, int y) const;
     void set_window_width(int width);
 };
 #endif

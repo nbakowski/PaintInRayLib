@@ -6,7 +6,9 @@
 #include <format>
 #include <optional>
 
-#include "settings_manager.h"
+#include "paint_canvas.h"
+
+using color_pick_result = gui_manager::color_pick_result;
 
 constexpr auto min_window_width = 800;
 constexpr auto min_window_height = 600;
@@ -22,7 +24,7 @@ namespace
         DrawCircle(x, y, radius, color);
     }
 
-    std::optional<std::tuple<Color, int>> check_for_toolbar_actions(const int x, const int y, gui_manager& g)
+    std::optional<color_pick_result> check_for_toolbar_actions(const int x, const int y, const gui_manager& g)
     {
         if (y <= toolbar_height)
         {
@@ -48,8 +50,8 @@ int main()
     constexpr int screen_width = 1270;
     constexpr int screen_height = 720;
 
-    auto settings = settings_manager();
-    const auto& colors = settings.get_colors();
+    paint_canvas canvas;
+    const auto& colors = canvas.get_colors();
     auto gui = gui_manager(
         1270,
         std::vector(
@@ -58,10 +60,9 @@ int main()
         )
     );
 
-    Color current_color = settings.get_colors().front();
+    Color current_color = colors.front();
     std::size_t color_index = 0;
 
-    // ReSharper disable once CppTooWideScope
     constexpr std::array<float, 6> brush_sizes = { 5, 15, 20, 25, 50, 100 };
     std::size_t brush_size_index = 0;
     double last_right_click = 0;
@@ -79,7 +80,7 @@ int main()
     {
         const int mouse_x = GetMouseX();
         const int mouse_y = GetMouseY();
-        const float current_brush_size = brush_sizes.at(brush_size_index);
+        const float current_brush_size = brush_sizes[brush_size_index];
 
         if (current_width != GetScreenWidth())
         {
@@ -93,13 +94,13 @@ int main()
 
         if (auto color_and_index = check_for_toolbar_actions(mouse_x, mouse_y, gui))
         {
-            current_color = std::get<0>(color_and_index.value());
-            color_index = std::get<1>(color_and_index.value());
+            current_color = color_and_index->color;
+            color_index = color_and_index->index;
         }
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && IsCursorHidden())
         {
-            settings.draw_circle_on_canvas(mouse_x, mouse_y, current_color, current_brush_size);
+            canvas.draw_circle_on_canvas(mouse_x, mouse_y, current_color, current_brush_size);
         }
 
         // Change the brush size
@@ -115,21 +116,21 @@ int main()
 
         // Cycle through colors with middle mouse button, really cool!
         if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
-            color_index = (color_index + 1) % settings.get_colors().size();
-            current_color = settings.get_colors().at(color_index);
+            color_index = (color_index + 1) % colors.size();
+            current_color = colors[color_index];
         }
 
-        if (IsKeyPressed(KEY_C)) { settings.clear_canvas(); }
+        if (IsKeyPressed(KEY_C)) { canvas.clear_canvas(); }
 
         // Draw the buffer for previously drawn circles
-        for (const auto& [x, y, color, radius] : settings.get_circle_positions())
+        for (const auto& [x, y, color, radius] : canvas.get_circle_positions())
         {
             DrawCircle(x, y, radius, color);
         }
 
         // Draw the brush
         draw_brush_at_mouse_position(mouse_x, mouse_y, current_brush_size, current_color);
-        gui.draw_toolbar(color_index, brush_sizes.at(brush_size_index));
+        gui.draw_toolbar(color_index, brush_sizes[brush_size_index]);
 
         EndDrawing();
     }
