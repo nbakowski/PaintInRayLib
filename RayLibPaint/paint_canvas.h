@@ -1,8 +1,8 @@
 //
 // Created by Nikodem Bąkowski on 18/06/2026.
 //
-#ifndef SETTINGS_MANAGER_H
-#define SETTINGS_MANAGER_H
+#ifndef PAINT_CANVAS_H
+#define PAINT_CANVAS_H
 
 #include <array>
 #include <vector>

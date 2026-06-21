@@ -29,12 +29,13 @@ namespace
         if (y <= toolbar_height)
         {
             ShowCursor();
-            if (
-                const auto return_color = g.get_color_from_toolbar(x, y);
-                return_color.has_value() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)
-                )
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
             {
-                return return_color;
+                if (const auto return_color = g.get_color_from_toolbar(x, y);
+                    return_color.has_value())
+                {
+                    return return_color;
+                }
             }
         }
         else

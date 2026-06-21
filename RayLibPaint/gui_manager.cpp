@@ -13,7 +13,7 @@ inline constexpr int thickness = 3;
 inline constexpr float outline_size = static_cast<float>(square_size) + thickness * 2;
 
 
-namespace
+namespace gui_helper_functions
 {
     void draw_selected_outline(const int x, const int y)
     {
@@ -72,7 +72,7 @@ void gui_manager::draw_toolbar(const std::size_t selected_color, const std::size
 
         if (i == selected_color)
         {
-            draw_selected_outline(x, position_y);
+            gui_helper_functions::draw_selected_outline(x, position_y);
         }
         i++;
     }
@@ -85,7 +85,7 @@ void gui_manager::draw_toolbar(const std::size_t selected_color, const std::size
         
         if (j == selected_brush_size)
         {
-            draw_selected_outline(x, position_y);
+            gui_helper_functions::draw_selected_outline(x, position_y);
         }
         j++;
     }
