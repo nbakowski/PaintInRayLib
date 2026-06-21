@@ -52,18 +52,22 @@ int main()
 
     paint_canvas canvas;
     const auto& colors = canvas.get_colors();
+    const auto& brush_sizes = canvas.get_brush_sizes();
     auto gui = gui_manager(
         1270,
         std::vector(
             std::begin(colors),
             std::end(colors)
+        ),
+        std::vector(
+            std::begin(brush_sizes),
+            std::end(brush_sizes)
         )
     );
 
     Color current_color = colors.front();
     std::size_t color_index = 0;
 
-    constexpr std::array<float, 6> brush_sizes = { 5, 15, 20, 25, 50, 100 };
     std::size_t brush_size_index = 0;
     double last_right_click = 0;
 
@@ -80,7 +84,7 @@ int main()
     {
         const int mouse_x = GetMouseX();
         const int mouse_y = GetMouseY();
-        const float current_brush_size = brush_sizes[brush_size_index];
+        const float current_brush_size = canvas.get_brush_sizes()[brush_size_index];
 
         if (current_width != GetScreenWidth())
         {
@@ -98,6 +102,14 @@ int main()
             color_index = color_and_index->index;
         }
 
+        if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+        {
+            if (auto brush_size_index_result = gui.get_brush_size_from_toolbar(mouse_x, mouse_y))
+            {
+                brush_size_index = brush_size_index_result.value();
+            }
+        }
+
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && IsCursorHidden())
         {
             canvas.draw_circle_on_canvas(mouse_x, mouse_y, current_color, current_brush_size);
@@ -109,7 +121,7 @@ int main()
             constexpr float time_between_clicks = 0.2f;
             if (const double click_time = GetTime(); click_time - last_right_click > time_between_clicks)
             {
-                brush_size_index = (brush_size_index + 1) % brush_sizes.size();
+                brush_size_index = (brush_size_index + 1) % canvas.get_brush_sizes().size();
                 last_right_click = GetTime();
             }
         }
@@ -130,7 +142,7 @@ int main()
 
         // Draw the brush
         draw_brush_at_mouse_position(mouse_x, mouse_y, current_brush_size, current_color);
-        gui.draw_toolbar(color_index, brush_sizes[brush_size_index]);
+        gui.draw_toolbar(color_index, brush_size_index);
 
         EndDrawing();
     }
