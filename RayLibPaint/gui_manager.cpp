@@ -9,9 +9,29 @@
 
 inline constexpr int square_size = 50;
 inline constexpr int text_padding = 4;
+inline constexpr int thickness = 3;
+inline constexpr float outline_size = static_cast<float>(square_size) + thickness * 2;
+
+
+namespace
+{
+    void draw_selected_outline(const int x, const int y)
+    {
+        const float outline_position_x = static_cast<float>(x) - thickness;
+        const float outline_position_y = static_cast<float>(y) - thickness;
+
+        const Rectangle outline_rect = {
+            .x = outline_position_x,
+            .y = outline_position_y,
+            .width = outline_size,
+            .height = outline_size
+        };
+        DrawRectangleLinesEx(outline_rect, thickness, BLACK);
+    }
+}
 
 gui_manager::gui_manager(const int width, const std::vector<Color>& colors, const std::vector<int>& brush_sizes)
-    : brush_sizes_(brush_sizes), colors_(colors), window_width_(width)
+    : colors_(colors), brush_sizes_(brush_sizes), window_width_(width)
 {
     int position_x = 15;
     for (const auto& color : colors_)
@@ -27,7 +47,6 @@ gui_manager::gui_manager(const int width, const std::vector<Color>& colors, cons
     
     for (const auto& size : brush_sizes_)
     {
-        constexpr int square_size = 50;
         constexpr int position_y = 15;
         size_square_positions_.push_back({
             .x = position_x,
@@ -47,38 +66,26 @@ void gui_manager::draw_toolbar(const std::size_t selected_color, const std::size
     DrawRectangle(0, 0, window_width_, toolbar_height, RAYWHITE);
 
     std::size_t i = 0;
-    for (const auto& square : color_square_positions_)
+    for (const auto& [x, y, color] : color_square_positions_)
     {
-        DrawRectangle(square.x, square.y, square_size, square_size, square.color);
+        DrawRectangle(x, y, square_size, square_size, color);
 
         if (i == selected_color)
         {
-            constexpr int thickness = 3;
-            const float outline_size = static_cast<float>(square_size) + thickness * 2;
-            const float outline_position_x = static_cast<float>(square.x) - thickness;
-            constexpr int outline_position_y = position_y - thickness;
-
-            const Rectangle outline_rect = { outline_position_x, outline_position_y, outline_size, outline_size };
-            DrawRectangleLinesEx(outline_rect, thickness, BLACK);
+            draw_selected_outline(x, position_y);
         }
         i++;
     }
     
     std::size_t j = 0;
-    for (const auto& size_square : size_square_positions_)
+    for (const auto& [x, y, value] : size_square_positions_)
     {
-        DrawRectangle(size_square.x, size_square.y, square_size, square_size, GRAY);
-        DrawText(size_square.value.c_str(), size_square.x + text_padding, size_square.y + text_padding, 24, BLACK);
+        DrawRectangle(x, y, square_size, square_size, GRAY);
+        DrawText(value.c_str(), x + text_padding, y + text_padding, 24, BLACK);
         
         if (j == selected_brush_size)
         {
-            constexpr int thickness = 3;
-            const float outline_size = static_cast<float>(square_size) + thickness * 2;
-            const float outline_position_x = static_cast<float>(size_square.x) - thickness;
-            constexpr int outline_position_y = position_y - thickness;
-
-            const Rectangle outline_rect = { outline_position_x, outline_position_y, outline_size, outline_size };
-            DrawRectangleLinesEx(outline_rect, thickness, BLACK);
+            draw_selected_outline(x, position_y);
         }
         j++;
     }
@@ -88,11 +95,14 @@ void gui_manager::draw_toolbar(const std::size_t selected_color, const std::size
 std::optional<gui_manager::color_pick_result> gui_manager::get_color_from_toolbar(const int x, const int y) const
 {
     int i = 0;
-    for (const auto& square : color_square_positions_)
+    for (const auto& [square_x, square_y, square_color] : color_square_positions_)
     {
-        if (x >= square.x && x <= square.x + square_size && y >= square.y && y <= square.y + square_size)
+        if (x >= square_x && x <= square_x + square_size && y >= square_y && y <= square_y + square_size)
         {
-            return color_pick_result{ square.color, i };
+            return color_pick_result{ 
+            	.color = square_color,
+            	.index = i 
+            };
         }
         i++;
     }

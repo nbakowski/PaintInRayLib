@@ -30,7 +30,7 @@ namespace
         {
             ShowCursor();
             if (
-                auto return_color = g.get_color_from_toolbar(x, y);
+                const auto return_color = g.get_color_from_toolbar(x, y);
                 return_color.has_value() && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)
                 )
             {
@@ -84,7 +84,7 @@ int main()
     {
         const int mouse_x = GetMouseX();
         const int mouse_y = GetMouseY();
-        const float current_brush_size = canvas.get_brush_sizes()[brush_size_index];
+        const int current_brush_size = canvas.get_brush_sizes()[brush_size_index];
 
         if (current_width != GetScreenWidth())
         {
@@ -96,7 +96,7 @@ int main()
 
         ClearBackground(WHITE);
 
-        if (auto color_and_index = check_for_toolbar_actions(mouse_x, mouse_y, gui))
+        if (const auto color_and_index = check_for_toolbar_actions(mouse_x, mouse_y, gui))
         {
             current_color = color_and_index->color;
             color_index = color_and_index->index;
@@ -112,7 +112,7 @@ int main()
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && IsCursorHidden())
         {
-            canvas.draw_circle_on_canvas(mouse_x, mouse_y, current_color, current_brush_size);
+            canvas.draw_circle_on_canvas(mouse_x, mouse_y, current_color, static_cast<float>(current_brush_size));
         }
 
         // Change the brush size
@@ -141,7 +141,7 @@ int main()
         }
 
         // Draw the brush
-        draw_brush_at_mouse_position(mouse_x, mouse_y, current_brush_size, current_color);
+        draw_brush_at_mouse_position(mouse_x, mouse_y, static_cast<float>(current_brush_size), current_color);
         gui.draw_toolbar(color_index, brush_size_index);
 
         EndDrawing();

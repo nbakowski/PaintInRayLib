@@ -143,12 +143,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="gui_manager.h" />
-    <ClInclude Include="settings_manager.h" />
+    <ClInclude Include="paint_canvas.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="gui_manager.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="settings_manager.cpp" />
+    <ClCompile Include="paint_canvas.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
