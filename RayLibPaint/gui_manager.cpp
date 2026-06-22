@@ -11,7 +11,9 @@ inline constexpr int square_size = 50;
 inline constexpr int text_padding = 4;
 inline constexpr int thickness = 3;
 inline constexpr float outline_size = static_cast<float>(square_size) + thickness * 2;
-
+inline constexpr int crosshair_length = 15;
+inline constexpr int crosshair_thickness = 2;
+inline constexpr int crosshair_gap = 2;
 
 namespace gui_helper_functions
 {
@@ -126,4 +128,16 @@ std::optional<int> gui_manager::get_brush_size_from_toolbar(const int x, const i
 void gui_manager::set_window_width(const int width)
 {
     window_width_ = width;
+}
+
+void gui_manager::draw_crosshair(const int x, const int y)
+{
+    // Left bar
+    DrawRectangle(x - crosshair_length - crosshair_gap, y - crosshair_thickness / 2, crosshair_length, crosshair_thickness, BLACK);
+    // Right bar
+    DrawRectangle(x + crosshair_gap, y - crosshair_thickness / 2, crosshair_length, crosshair_thickness, BLACK);
+    // Top bar
+    DrawRectangle(x - crosshair_thickness / 2, y - crosshair_length - crosshair_gap, crosshair_thickness, crosshair_length, BLACK);
+    // Bottom bar
+    DrawRectangle(x - crosshair_thickness / 2, y + crosshair_gap, crosshair_thickness, crosshair_length, BLACK);
 }

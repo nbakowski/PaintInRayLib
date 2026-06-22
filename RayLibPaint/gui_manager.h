@@ -46,5 +46,6 @@ public:
     std::optional<color_pick_result> get_color_from_toolbar(int x, int y) const;
     std::optional<int> get_brush_size_from_toolbar(int x, int y) const;
     void set_window_width(int width);
+    void draw_crosshair(int x, int y);
 };
 #endif
