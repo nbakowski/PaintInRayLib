@@ -55,7 +55,7 @@ int main()
     const auto& colors = canvas.get_colors();
     const auto& brush_sizes = canvas.get_brush_sizes();
     auto gui = gui_manager(
-        1270,
+        screen_width,
         std::vector(
             std::begin(colors),
             std::end(colors)
