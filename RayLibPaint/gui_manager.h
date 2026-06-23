@@ -42,10 +42,9 @@ public:
     };
 
     explicit gui_manager(int width, const std::vector<Color>& colors, const std::vector<int>& brush_sizes);
-    void draw_toolbar(const std::size_t selected_color, const std::size_t selected_brush_size) const;
-    std::optional<color_pick_result> get_color_from_toolbar(int x, int y) const;
-    std::optional<int> get_brush_size_from_toolbar(int x, int y) const;
+    void draw_gui(std::size_t selected_color, std::size_t selected_brush_size, int mouse_x, int mouse_y) const;
+    [[nodiscard]] std::optional<color_pick_result> get_color_from_toolbar(int x, int y) const;
+    [[nodiscard]] std::optional<int> get_brush_size_from_toolbar(int x, int y) const;
     void set_window_width(int width);
-    void draw_crosshair(int x, int y);
 };
 #endif

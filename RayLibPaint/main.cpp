@@ -143,12 +143,7 @@ int main()
 
         // Draw the brush
         draw_brush_at_mouse_position(mouse_x, mouse_y, static_cast<float>(current_brush_size), current_color);
-        gui.draw_toolbar(color_index, brush_size_index);
-        
-        if (IsCursorHidden())
-        {
-            gui.draw_crosshair(mouse_x, mouse_y);
-        }
+        gui.draw_gui(color_index, brush_size_index, mouse_x, mouse_y);
 
         EndDrawing();
     }

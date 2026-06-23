@@ -15,7 +15,7 @@ inline constexpr int crosshair_length = 15;
 inline constexpr int crosshair_thickness = 2;
 inline constexpr int crosshair_gap = 2;
 
-namespace gui_helper_functions
+namespace
 {
     void draw_selected_outline(const int x, const int y)
     {
@@ -29,6 +29,42 @@ namespace gui_helper_functions
             .height = outline_size
         };
         DrawRectangleLinesEx(outline_rect, thickness, BLACK);
+    }
+
+    void draw_crosshair(const int x, const int y)
+    {
+        // Left bar
+        DrawRectangle(
+            x - crosshair_length - crosshair_gap, 
+            y - crosshair_thickness / 2, 
+            crosshair_length, 
+            crosshair_thickness, 
+            BLACK
+        );
+        // Right bar
+        DrawRectangle(
+            x + crosshair_gap, 
+            y - crosshair_thickness / 2, 
+            crosshair_length, 
+            crosshair_thickness, 
+            BLACK
+        );
+        // Top bar
+        DrawRectangle(
+            x - crosshair_thickness / 2, 
+            y - crosshair_length - crosshair_gap, 
+            crosshair_thickness, 
+            crosshair_length, 
+            BLACK
+        );
+        // Bottom bar
+        DrawRectangle(
+            x - crosshair_thickness / 2, 
+            y + crosshair_gap, 
+            crosshair_thickness, 
+            crosshair_length, 
+            BLACK
+        );
     }
 }
 
@@ -61,7 +97,12 @@ gui_manager::gui_manager(const int width, const std::vector<Color>& colors, cons
     color_square_bar_size_ = position_x;
 }
 
-void gui_manager::draw_toolbar(const std::size_t selected_color, const std::size_t selected_brush_size) const
+void gui_manager::draw_gui(
+    const std::size_t selected_color, 
+    const std::size_t selected_brush_size, 
+    const int mouse_x, 
+    const int mouse_y
+) const
 {
     constexpr int position_y = 15;
 
@@ -74,7 +115,7 @@ void gui_manager::draw_toolbar(const std::size_t selected_color, const std::size
 
         if (i == selected_color)
         {
-            gui_helper_functions::draw_selected_outline(x, position_y);
+            draw_selected_outline(x, position_y);
         }
         i++;
     }
@@ -87,11 +128,22 @@ void gui_manager::draw_toolbar(const std::size_t selected_color, const std::size
         
         if (j == selected_brush_size)
         {
-            gui_helper_functions::draw_selected_outline(x, position_y);
+            draw_selected_outline(x, position_y);
         }
         j++;
     }
-    DrawText("Press 'C' to clear the canvas.", color_square_bar_size_, position_y, 20, BLACK);
+    DrawText(
+        "Press 'C' to clear the canvas.", 
+        color_square_bar_size_, 
+        position_y, 
+        20, 
+        BLACK
+    );
+
+    if (mouse_y > toolbar_height)
+    {
+        draw_crosshair(mouse_x, mouse_y);
+    }
 }
 
 std::optional<gui_manager::color_pick_result> gui_manager::get_color_from_toolbar(const int x, const int y) const
@@ -128,16 +180,4 @@ std::optional<int> gui_manager::get_brush_size_from_toolbar(const int x, const i
 void gui_manager::set_window_width(const int width)
 {
     window_width_ = width;
-}
-
-void gui_manager::draw_crosshair(const int x, const int y)
-{
-    // Left bar
-    DrawRectangle(x - crosshair_length - crosshair_gap, y - crosshair_thickness / 2, crosshair_length, crosshair_thickness, BLACK);
-    // Right bar
-    DrawRectangle(x + crosshair_gap, y - crosshair_thickness / 2, crosshair_length, crosshair_thickness, BLACK);
-    // Top bar
-    DrawRectangle(x - crosshair_thickness / 2, y - crosshair_length - crosshair_gap, crosshair_thickness, crosshair_length, BLACK);
-    // Bottom bar
-    DrawRectangle(x - crosshair_thickness / 2, y + crosshair_gap, crosshair_thickness, crosshair_length, BLACK);
 }
