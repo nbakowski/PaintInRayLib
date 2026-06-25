@@ -19,7 +19,7 @@ class gui_manager
         int y;
         Color color;
     };
-    
+
     struct size_square_positions
     {
         int x;

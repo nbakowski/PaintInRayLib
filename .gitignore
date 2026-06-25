@@ -367,3 +367,4 @@ build-xcode/
 
 # Ignore documentation
 DOCUMENTATION/
+.zed/

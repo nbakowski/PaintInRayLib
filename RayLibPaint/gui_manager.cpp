@@ -4,7 +4,6 @@
 
 #include "gui_manager.h"
 
-#include <format>
 #include <string>
 
 inline constexpr int square_size = 50;
@@ -35,34 +34,34 @@ namespace
     {
         // Left bar
         DrawRectangle(
-            x - crosshair_length - crosshair_gap, 
-            y - crosshair_thickness / 2, 
-            crosshair_length, 
-            crosshair_thickness, 
+            x - crosshair_length - crosshair_gap,
+            y - crosshair_thickness / 2,
+            crosshair_length,
+            crosshair_thickness,
             BLACK
         );
         // Right bar
         DrawRectangle(
-            x + crosshair_gap, 
-            y - crosshair_thickness / 2, 
-            crosshair_length, 
-            crosshair_thickness, 
+            x + crosshair_gap,
+            y - crosshair_thickness / 2,
+            crosshair_length,
+            crosshair_thickness,
             BLACK
         );
         // Top bar
         DrawRectangle(
-            x - crosshair_thickness / 2, 
-            y - crosshair_length - crosshair_gap, 
-            crosshair_thickness, 
-            crosshair_length, 
+            x - crosshair_thickness / 2,
+            y - crosshair_length - crosshair_gap,
+            crosshair_thickness,
+            crosshair_length,
             BLACK
         );
         // Bottom bar
         DrawRectangle(
-            x - crosshair_thickness / 2, 
-            y + crosshair_gap, 
-            crosshair_thickness, 
-            crosshair_length, 
+            x - crosshair_thickness / 2,
+            y + crosshair_gap,
+            crosshair_thickness,
+            crosshair_length,
             BLACK
         );
     }
@@ -82,7 +81,7 @@ gui_manager::gui_manager(const int width, const std::vector<Color>& colors, cons
         });
         position_x += 65;
     }
-    
+
     for (const auto& size : brush_sizes_)
     {
         constexpr int position_y = 15;
@@ -97,10 +96,11 @@ gui_manager::gui_manager(const int width, const std::vector<Color>& colors, cons
     color_square_bar_size_ = position_x;
 }
 
+// Handles the draw calls for UI elements. Toolbar and crosshair.
 void gui_manager::draw_gui(
-    const std::size_t selected_color, 
-    const std::size_t selected_brush_size, 
-    const int mouse_x, 
+    const std::size_t selected_color,
+    const std::size_t selected_brush_size,
+    const int mouse_x,
     const int mouse_y
 ) const
 {
@@ -119,13 +119,13 @@ void gui_manager::draw_gui(
         }
         i++;
     }
-    
+
     std::size_t j = 0;
     for (const auto& [x, y, value] : size_square_positions_)
     {
         DrawRectangle(x, y, square_size, square_size, GRAY);
         DrawText(value.c_str(), x + text_padding, y + text_padding, 24, BLACK);
-        
+
         if (j == selected_brush_size)
         {
             draw_selected_outline(x, position_y);
@@ -133,10 +133,10 @@ void gui_manager::draw_gui(
         j++;
     }
     DrawText(
-        "Press 'C' to clear the canvas.", 
-        color_square_bar_size_, 
-        position_y, 
-        20, 
+        "Press 'C' to clear the canvas.",
+        color_square_bar_size_,
+        position_y,
+        20,
         BLACK
     );
 
@@ -153,9 +153,9 @@ std::optional<gui_manager::color_pick_result> gui_manager::get_color_from_toolba
     {
         if (x >= square_x && x <= square_x + square_size && y >= square_y && y <= square_y + square_size)
         {
-            return color_pick_result{ 
+            return color_pick_result{
             	.color = square_color,
-            	.index = i 
+            	.index = i
             };
         }
         i++;

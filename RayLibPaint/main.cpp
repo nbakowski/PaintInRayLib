@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <array>
-#include <format>
 #include <optional>
 
 #include "paint_canvas.h"
