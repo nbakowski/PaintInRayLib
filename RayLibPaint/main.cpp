@@ -3,14 +3,18 @@
 
 #include <vector>
 #include <array>
+#include <filesystem>
+#include <format>
 #include <optional>
 
 #include "paint_canvas.h"
 
 using color_pick_result = gui_manager::color_pick_result;
 
-constexpr auto min_window_width = 800;
-constexpr auto min_window_height = 600;
+inline constexpr auto min_window_width = 800;
+inline constexpr auto min_window_height = 600;
+inline constexpr auto screenshot_delay = 2;
+inline constexpr std::string file_extension = "png";
 
 namespace
 {
@@ -43,12 +47,35 @@ namespace
         }
         return std::nullopt;
     }
+
+    // Get the amount of files that have been previously saved
+    // Avoid overwriting already existing files
+    int get_files_count()
+    {
+        auto file_counter = 0;
+        for (const auto& entry : std::filesystem::directory_iterator(std::filesystem::current_path()))
+        {
+            if (entry.path().filename() == std::format("file{}.{}}", file_counter, file_extension))
+            {
+                file_counter++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        return file_counter;
+    }
 }
 
 int main()
 {
     constexpr int screen_width = 1270;
     constexpr int screen_height = 720;
+
+    uint8_t screenshot_delay_counter = 0;
+    int screenshot_amount_counter = get_files_count();
+    bool is_screenshot_taken = false;
 
     paint_canvas canvas;
     const auto& colors = canvas.get_colors();
@@ -92,6 +119,25 @@ int main()
             current_width = GetScreenWidth();
         }
 
+        // Screenshot as a file saving mechanism 
+        if (IsKeyPressed(KEY_S) || is_screenshot_taken)
+        {
+            if (screenshot_delay_counter == screenshot_delay)
+            {
+
+                std::string file_name = std::format("file{}.{}}", screenshot_amount_counter, file_extension);
+                TakeScreenshot(file_name.c_str());
+                screenshot_delay_counter = 0;
+                screenshot_amount_counter++;
+                is_screenshot_taken = false;
+            }
+            else
+            {
+                is_screenshot_taken = true;
+                screenshot_delay_counter++;
+            }
+        }
+
         BeginDrawing();
 
         ClearBackground(WHITE);
@@ -127,7 +173,8 @@ int main()
         }
 
         // Cycle through colors with middle mouse button, really cool!
-        if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) {
+        if (IsMouseButtonPressed(MOUSE_BUTTON_MIDDLE)) 
+        {
             color_index = (color_index + 1) % colors.size();
             current_color = colors[color_index];
         }
@@ -140,9 +187,13 @@ int main()
             DrawCircle(x, y, radius, color);
         }
 
-        // Draw the brush
-        draw_brush_at_mouse_position(mouse_x, mouse_y, static_cast<float>(current_brush_size), current_color);
-        gui.draw_gui(color_index, brush_size_index, mouse_x, mouse_y);
+        // Draw the GUI
+        // Turn the GUI off for the screenshot
+        if (!is_screenshot_taken)
+        {
+            draw_brush_at_mouse_position(mouse_x, mouse_y, static_cast<float>(current_brush_size), current_color);
+            gui.draw_gui(color_index, brush_size_index, mouse_x, mouse_y);
+        }
 
         EndDrawing();
     }

@@ -140,7 +140,15 @@ void gui_manager::draw_gui(
         BLACK
     );
 
-    if (mouse_y > toolbar_height)
+    DrawText(
+        "Press 'S' to save.",
+        color_square_bar_size_,
+        position_y * 3,
+        20,
+        BLACK
+    );
+
+    if (mouse_y > toolbar_height  && is_crosshair_enabled_)
     {
         draw_crosshair(mouse_x, mouse_y);
     }
@@ -153,7 +161,7 @@ std::optional<gui_manager::color_pick_result> gui_manager::get_color_from_toolba
     {
         if (x >= square_x && x <= square_x + square_size && y >= square_y && y <= square_y + square_size)
         {
-            return color_pick_result{
+            return color_pick_result {
             	.color = square_color,
             	.index = i
             };

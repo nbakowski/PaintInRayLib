@@ -33,6 +33,7 @@ class gui_manager
     int color_square_bar_size_;
     std::vector<color_square_positions> color_square_positions_;
     std::vector<size_square_positions> size_square_positions_;
+    bool is_crosshair_enabled_ = true;
 
 public:
     struct color_pick_result
