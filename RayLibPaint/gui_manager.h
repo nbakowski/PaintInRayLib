@@ -34,6 +34,8 @@ class gui_manager
     std::vector<color_square_positions> color_square_positions_;
     std::vector<size_square_positions> size_square_positions_;
     bool is_crosshair_enabled_ = true;
+    Texture2D save_icon_;
+    std::tuple<int, int> save_icon_position_;
 
 public:
     struct color_pick_result
@@ -47,5 +49,6 @@ public:
     [[nodiscard]] std::optional<color_pick_result> get_color_from_toolbar(int x, int y) const;
     [[nodiscard]] std::optional<int> get_brush_size_from_toolbar(int x, int y) const;
     void set_window_width(int width);
+    [[nodiscard]] std::tuple<int, int, int> get_save_icon_position() const;
 };
 #endif

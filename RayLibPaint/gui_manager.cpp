@@ -7,12 +7,14 @@
 #include <string>
 
 inline constexpr int square_size = 50;
+inline constexpr int distance_between_squares = 65;
 inline constexpr int text_padding = 4;
 inline constexpr int thickness = 3;
 inline constexpr float outline_size = static_cast<float>(square_size) + thickness * 2;
 inline constexpr int crosshair_length = 15;
 inline constexpr int crosshair_thickness = 2;
 inline constexpr int crosshair_gap = 2;
+inline constexpr int spacing_from_top_of_the_window = 15;
 
 namespace
 {
@@ -73,25 +75,28 @@ gui_manager::gui_manager(const int width, const std::vector<Color>& colors, cons
     int position_x = 15;
     for (const auto& color : colors_)
     {
-        constexpr int position_y = 15;
         color_square_positions_.push_back({
             .x = position_x,
-            .y = position_y,
+            .y = spacing_from_top_of_the_window,
             .color = color
         });
-        position_x += 65;
+        position_x += distance_between_squares;
     }
 
     for (const auto& size : brush_sizes_)
     {
-        constexpr int position_y = 15;
         size_square_positions_.push_back({
             .x = position_x,
-            .y = position_y,
+            .y = spacing_from_top_of_the_window,
             .value = std::to_string(size)
         });
-        position_x += 65;
+        position_x += distance_between_squares;
     }
+
+	Image save_icon_image = LoadImage("images/save_icon.png");
+    ImageResize(&save_icon_image, square_size, square_size);
+
+    save_icon_ = LoadTextureFromImage(save_icon_image);
 
     color_square_bar_size_ = position_x;
 }
@@ -104,8 +109,6 @@ void gui_manager::draw_gui(
     const int mouse_y
 ) const
 {
-    constexpr int position_y = 15;
-
     DrawRectangle(0, 0, window_width_, toolbar_height, RAYWHITE);
 
     std::size_t i = 0;
@@ -115,7 +118,7 @@ void gui_manager::draw_gui(
 
         if (i == selected_color)
         {
-            draw_selected_outline(x, position_y);
+            draw_selected_outline(x, spacing_from_top_of_the_window);
         }
         i++;
     }
@@ -128,22 +131,17 @@ void gui_manager::draw_gui(
 
         if (j == selected_brush_size)
         {
-            draw_selected_outline(x, position_y);
+            draw_selected_outline(x, spacing_from_top_of_the_window);
         }
         j++;
     }
-    DrawText(
-        "Press 'C' to clear the canvas.",
-        color_square_bar_size_,
-        position_y,
-        20,
-        BLACK
-    );
+
+    DrawTexture(save_icon_, color_square_bar_size_, spacing_from_top_of_the_window, WHITE);
 
     DrawText(
-        "Press 'S' to save.",
-        color_square_bar_size_,
-        position_y * 3,
+        "Press 'C' to clear the canvas.",
+        color_square_bar_size_ + distance_between_squares,
+        spacing_from_top_of_the_window,
         20,
         BLACK
     );
@@ -188,4 +186,9 @@ std::optional<int> gui_manager::get_brush_size_from_toolbar(const int x, const i
 void gui_manager::set_window_width(const int width)
 {
     window_width_ = width;
+}
+
+std::tuple<int, int, int> gui_manager::get_save_icon_position() const
+{
+    return {color_square_bar_size_, spacing_from_top_of_the_window, square_size };
 }

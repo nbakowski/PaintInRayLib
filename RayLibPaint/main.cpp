@@ -14,7 +14,7 @@ using color_pick_result = gui_manager::color_pick_result;
 inline constexpr auto min_window_width = 800;
 inline constexpr auto min_window_height = 600;
 inline constexpr auto screenshot_delay = 2;
-inline constexpr std::string file_extension = "png";
+inline constexpr std::string_view file_extension = "png";
 
 namespace
 {
@@ -55,7 +55,7 @@ namespace
         auto file_counter = 0;
         for (const auto& entry : std::filesystem::directory_iterator(std::filesystem::current_path()))
         {
-            if (entry.path().filename() == std::format("file{}.{}}", file_counter, file_extension))
+            if (entry.path().filename() == std::format("file{}.{}", file_counter, file_extension))
             {
                 file_counter++;
             }
@@ -66,12 +66,22 @@ namespace
         }
         return file_counter;
     }
+
+    bool is_value_in_range(const int value, const int lower_bound, const int upper_bound)
+    {
+        return value >= lower_bound && value <= upper_bound;
+    }
 }
 
 int main()
 {
     constexpr int screen_width = 1270;
     constexpr int screen_height = 720;
+
+    // Set window options
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitWindow(screen_width, screen_height, "SigmaPaint");
+    SetWindowMinSize(min_window_width, min_window_height);
 
     uint8_t screenshot_delay_counter = 0;
     int screenshot_amount_counter = get_files_count();
@@ -98,11 +108,6 @@ int main()
     std::size_t brush_size_index = 0;
     double last_right_click = 0;
 
-    // Set window options
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(screen_width, screen_height, "SigmaPaint");
-    SetWindowMinSize(min_window_width, min_window_height);
-
     int current_width = GetScreenWidth();
 
     HideCursor();
@@ -125,7 +130,7 @@ int main()
             if (screenshot_delay_counter == screenshot_delay)
             {
 
-                std::string file_name = std::format("file{}.{}}", screenshot_amount_counter, file_extension);
+                std::string file_name = std::format("file{}.{}", screenshot_amount_counter, file_extension);
                 TakeScreenshot(file_name.c_str());
                 screenshot_delay_counter = 0;
                 screenshot_amount_counter++;
@@ -153,6 +158,15 @@ int main()
             if (auto brush_size_index_result = gui.get_brush_size_from_toolbar(mouse_x, mouse_y))
             {
                 brush_size_index = brush_size_index_result.value();
+            }
+
+            const auto save_icon_positions = gui.get_save_icon_position();
+            const int icon_x = get<0>(save_icon_positions);
+            const int icon_y = get<1>(save_icon_positions);
+            const int square_size = get<2>(save_icon_positions);
+            if (is_value_in_range(mouse_x, icon_x, icon_x + square_size) && is_value_in_range(mouse_y, icon_y, icon_y + square_size))
+            {
+                is_screenshot_taken = true;
             }
         }
 
