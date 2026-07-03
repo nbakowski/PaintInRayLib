@@ -163,8 +163,11 @@ int main()
             const auto save_icon_positions = gui.get_save_icon_position();
             const int icon_x = get<0>(save_icon_positions);
             const int icon_y = get<1>(save_icon_positions);
-            const int square_size = get<2>(save_icon_positions);
-            if (is_value_in_range(mouse_x, icon_x, icon_x + square_size) && is_value_in_range(mouse_y, icon_y, icon_y + square_size))
+            
+            if (
+                const int square_size = get<2>(save_icon_positions);
+                is_value_in_range(mouse_x, icon_x, icon_x + square_size) && is_value_in_range(mouse_y, icon_y, icon_y + square_size)
+                )
             {
                 is_screenshot_taken = true;
             }

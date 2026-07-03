@@ -368,3 +368,9 @@ build-xcode/
 # Ignore documentation
 DOCUMENTATION/
 .zed/
+
+#ignore images
+*.png
+*.jpg
+*.jpeg
+*.gif
