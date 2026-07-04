@@ -47,24 +47,17 @@ namespace
         }
         return std::nullopt;
     }
-
-    // Get the amount of files that have been previously saved
-    // Avoid overwriting already existing files
-    int get_files_count()
+    
+    std::string get_next_available_filename()
     {
-        auto file_counter = 0;
-        for (const auto& entry : std::filesystem::directory_iterator(std::filesystem::current_path()))
+        int index = 0;
+        std::string name;
+        do
         {
-            if (entry.path().filename() == std::format("file{}.{}", file_counter, file_extension))
-            {
-                file_counter++;
-            }
-            else
-            {
-                break;
-            }
-        }
-        return file_counter;
+            name = std::format("file{}.{}", index, file_extension);
+            index++;
+        } while (std::filesystem::exists(name));
+        return name;
     }
 
     bool is_value_in_range(const int value, const int lower_bound, const int upper_bound)
@@ -84,7 +77,6 @@ int main()
     SetWindowMinSize(min_window_width, min_window_height);
 
     uint8_t screenshot_delay_counter = 0;
-    int screenshot_amount_counter = get_files_count();
     bool is_screenshot_taken = false;
 
     paint_canvas canvas;
@@ -129,11 +121,8 @@ int main()
         {
             if (screenshot_delay_counter == screenshot_delay)
             {
-
-                std::string file_name = std::format("file{}.{}", screenshot_amount_counter, file_extension);
-                TakeScreenshot(file_name.c_str());
+                TakeScreenshot(get_next_available_filename().c_str());
                 screenshot_delay_counter = 0;
-                screenshot_amount_counter++;
                 is_screenshot_taken = false;
             }
             else
@@ -170,6 +159,7 @@ int main()
                 )
             {
                 is_screenshot_taken = true;
+                gui.show_save_message();
             }
         }
 

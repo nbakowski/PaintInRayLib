@@ -4,6 +4,7 @@
 
 #include "gui_manager.h"
 
+#include <iostream>
 #include <string>
 
 inline constexpr int square_size = 50;
@@ -15,6 +16,10 @@ inline constexpr int crosshair_length = 15;
 inline constexpr int crosshair_thickness = 2;
 inline constexpr int crosshair_gap = 2;
 inline constexpr int spacing_from_top_of_the_window = 15;
+inline constexpr int gui_text_font_size = 20;
+inline constexpr int message_text_x = spacing_from_top_of_the_window;
+inline constexpr int message_text_y = spacing_from_top_of_the_window + distance_between_squares + gui_text_font_size;
+inline constexpr int message_delay = 5;
 
 namespace
 {
@@ -94,11 +99,19 @@ gui_manager::gui_manager(const int width, const std::vector<Color>& colors, cons
     }
 
 	Image save_icon_image = LoadImage("images/save_icon.png");
+    if (save_icon_image.data == nullptr)
+    {
+        std::cerr << "Warning: failed to load images/save_icon.png\n";
+    }
     ImageResize(&save_icon_image, square_size, square_size);
-
     save_icon_ = LoadTextureFromImage(save_icon_image);
-
+    UnloadImage(save_icon_image);
     color_square_bar_size_ = position_x;
+}
+
+gui_manager::~gui_manager()
+{
+    UnloadTexture(save_icon_);
 }
 
 // Handles the draw calls for UI elements. Toolbar and crosshair.
@@ -107,7 +120,7 @@ void gui_manager::draw_gui(
     const std::size_t selected_brush_size,
     const int mouse_x,
     const int mouse_y
-) const
+	)
 {
     DrawRectangle(0, 0, window_width_, toolbar_height, RAYWHITE);
 
@@ -118,7 +131,7 @@ void gui_manager::draw_gui(
 
         if (i == selected_color)
         {
-            draw_selected_outline(x, spacing_from_top_of_the_window);
+            draw_selected_outline(x, y);
         }
         i++;
     }
@@ -131,18 +144,48 @@ void gui_manager::draw_gui(
 
         if (j == selected_brush_size)
         {
-            draw_selected_outline(x, spacing_from_top_of_the_window);
+            draw_selected_outline(x, y);
         }
         j++;
     }
 
+    // Draw the save icon. When mouse is hovering over it,
+    // draw the outline
     DrawTexture(save_icon_, color_square_bar_size_, spacing_from_top_of_the_window, WHITE);
+    if (
+        mouse_x >= color_square_bar_size_
+        && mouse_x <= color_square_bar_size_ + square_size
+        && mouse_y >= spacing_from_top_of_the_window
+        && mouse_y <= spacing_from_top_of_the_window + square_size
+        )
+    {
+	    draw_selected_outline(color_square_bar_size_, spacing_from_top_of_the_window);
+        elapsed_text_display_time_ = GetTime();
+    }
+
+    if (showing_save_message_)
+    {
+        if (const double t = GetTime(); t - elapsed_text_display_time_ <= message_delay)
+        {
+            DrawText(
+                "File saved!",
+                message_text_x,
+                message_text_y,
+                gui_text_font_size,
+                BLACK
+            );
+        }
+        else
+        {
+            hide_save_message();
+        }
+    }
 
     DrawText(
         "Press 'C' to clear the canvas.",
         color_square_bar_size_ + distance_between_squares,
         spacing_from_top_of_the_window,
-        20,
+        gui_text_font_size,
         BLACK
     );
 
@@ -190,5 +233,15 @@ void gui_manager::set_window_width(const int width)
 
 std::tuple<int, int, int> gui_manager::get_save_icon_position() const
 {
-    return {color_square_bar_size_, spacing_from_top_of_the_window, square_size };
+    return { color_square_bar_size_, spacing_from_top_of_the_window, square_size };
+}
+
+void gui_manager::show_save_message()
+{
+    showing_save_message_ = true;
+}
+
+void gui_manager::hide_save_message()
+{
+    showing_save_message_ = false;
 }

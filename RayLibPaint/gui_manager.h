@@ -30,12 +30,13 @@ class gui_manager
     std::vector<Color> colors_;
     std::vector<int> brush_sizes_;
     int window_width_ = 0;
-    int color_square_bar_size_;
+    int color_square_bar_size_ = 0;
     std::vector<color_square_positions> color_square_positions_;
     std::vector<size_square_positions> size_square_positions_;
     bool is_crosshair_enabled_ = true;
     Texture2D save_icon_;
-    std::tuple<int, int> save_icon_position_;
+    double elapsed_text_display_time_ = 0;
+    bool showing_save_message_ = false;
 
 public:
     struct color_pick_result
@@ -45,10 +46,13 @@ public:
     };
 
     explicit gui_manager(int width, const std::vector<Color>& colors, const std::vector<int>& brush_sizes);
-    void draw_gui(std::size_t selected_color, std::size_t selected_brush_size, int mouse_x, int mouse_y) const;
+    ~gui_manager();
+    void draw_gui(std::size_t selected_color, std::size_t selected_brush_size, int mouse_x, int mouse_y);
     [[nodiscard]] std::optional<color_pick_result> get_color_from_toolbar(int x, int y) const;
     [[nodiscard]] std::optional<int> get_brush_size_from_toolbar(int x, int y) const;
     void set_window_width(int width);
     [[nodiscard]] std::tuple<int, int, int> get_save_icon_position() const;
+    void show_save_message();
+    void hide_save_message();
 };
 #endif
