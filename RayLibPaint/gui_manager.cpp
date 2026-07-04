@@ -18,8 +18,8 @@ inline constexpr int crosshair_gap = 2;
 inline constexpr int spacing_from_top_of_the_window = 15;
 inline constexpr int gui_text_font_size = 20;
 inline constexpr int message_text_x = spacing_from_top_of_the_window;
-inline constexpr int message_text_y = spacing_from_top_of_the_window + distance_between_squares + gui_text_font_size;
-inline constexpr int message_delay = 5;
+inline constexpr int message_text_y = toolbar_height + spacing_from_top_of_the_window;
+inline constexpr int message_delay = 10;
 
 namespace
 {
@@ -124,62 +124,13 @@ void gui_manager::draw_gui(
 {
     DrawRectangle(0, 0, window_width_, toolbar_height, RAYWHITE);
 
-    std::size_t i = 0;
-    for (const auto& [x, y, color] : color_square_positions_)
-    {
-        DrawRectangle(x, y, square_size, square_size, color);
+    draw_selected_color_indicator(selected_color);
 
-        if (i == selected_color)
-        {
-            draw_selected_outline(x, y);
-        }
-        i++;
-    }
+    draw_selected_brush_size_indicator(selected_brush_size);
 
-    std::size_t j = 0;
-    for (const auto& [x, y, value] : size_square_positions_)
-    {
-        DrawRectangle(x, y, square_size, square_size, GRAY);
-        DrawText(value.c_str(), x + text_padding, y + text_padding, 24, BLACK);
+    draw_save_icon(mouse_x, mouse_y);
 
-        if (j == selected_brush_size)
-        {
-            draw_selected_outline(x, y);
-        }
-        j++;
-    }
-
-    // Draw the save icon. When mouse is hovering over it,
-    // draw the outline
-    DrawTexture(save_icon_, color_square_bar_size_, spacing_from_top_of_the_window, WHITE);
-    if (
-        mouse_x >= color_square_bar_size_
-        && mouse_x <= color_square_bar_size_ + square_size
-        && mouse_y >= spacing_from_top_of_the_window
-        && mouse_y <= spacing_from_top_of_the_window + square_size
-        )
-    {
-	    draw_selected_outline(color_square_bar_size_, spacing_from_top_of_the_window);
-        elapsed_text_display_time_ = GetTime();
-    }
-
-    if (showing_save_message_)
-    {
-        if (const double t = GetTime(); t - elapsed_text_display_time_ <= message_delay)
-        {
-            DrawText(
-                "File saved!",
-                message_text_x,
-                message_text_y,
-                gui_text_font_size,
-                BLACK
-            );
-        }
-        else
-        {
-            hide_save_message();
-        }
-    }
+    display_save_message();
 
     DrawText(
         "Press 'C' to clear the canvas.",
@@ -239,9 +190,86 @@ std::tuple<int, int, int> gui_manager::get_save_icon_position() const
 void gui_manager::show_save_message()
 {
     showing_save_message_ = true;
+    elapsed_text_display_time_ = GetTime();
 }
 
 void gui_manager::hide_save_message()
 {
     showing_save_message_ = false;
+}
+
+void gui_manager::draw_selected_brush_size_indicator(const size_t brush_size_i)
+{
+    std::size_t j = 0;
+    for (const auto& [x, y, value] : size_square_positions_)
+    {
+        DrawRectangle(x, y, square_size, square_size, GRAY);
+        DrawText(value.c_str(), x + text_padding, y + text_padding, 24, BLACK);
+
+        if (j == brush_size_i)
+        {
+            draw_selected_outline(x, y);
+        }
+        j++;
+    }
+}
+
+void gui_manager::draw_selected_color_indicator(const size_t color_i)
+{
+    std::size_t i = 0;
+    for (const auto& [x, y, color] : color_square_positions_)
+    {
+        DrawRectangle(x, y, square_size, square_size, color);
+
+        if (i == color_i)
+        {
+            draw_selected_outline(x, y);
+        }
+        i++;
+    }
+}
+
+void gui_manager::draw_save_icon(const int m_x, const int m_y) const
+{
+    // Draw the save icon. When mouse is hovering over it,
+    // draw the outline
+    DrawTexture(save_icon_, color_square_bar_size_, spacing_from_top_of_the_window, WHITE);
+    if (
+        m_x >= color_square_bar_size_
+        && m_x <= color_square_bar_size_ + square_size
+        && m_y >= spacing_from_top_of_the_window
+        && m_y <= spacing_from_top_of_the_window + square_size
+        )
+    {
+        draw_selected_outline(color_square_bar_size_, spacing_from_top_of_the_window);
+    }
+}
+
+void gui_manager::display_save_message()
+{
+    if (showing_save_message_)
+    {
+        if (const double t = GetTime(); t - elapsed_text_display_time_ < message_delay)
+        {
+            Color text_color;
+
+            // Animate the text disappearing
+            if (t - elapsed_text_display_time_ < static_cast<float>(message_delay) * 0.15) { text_color = BLACK; }
+            else if (t - elapsed_text_display_time_ < static_cast<float>(message_delay) * 0.35) { text_color = DARKGRAY; }
+            else if (t - elapsed_text_display_time_ < static_cast<float>(message_delay) * 0.75) { text_color = GRAY; }
+            else { text_color = LIGHTGRAY; }
+
+            DrawText(
+                "File saved!",
+                message_text_x,
+                message_text_y,
+                gui_text_font_size,
+                text_color
+            );
+        }
+        else
+        {
+            hide_save_message();
+        }
+    }
 }

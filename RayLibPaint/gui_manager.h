@@ -38,6 +38,11 @@ class gui_manager
     double elapsed_text_display_time_ = 0;
     bool showing_save_message_ = false;
 
+    void draw_selected_brush_size_indicator(size_t brush_size_i);
+    void draw_selected_color_indicator(size_t color_i);
+    void draw_save_icon(int m_x, int m_y) const;
+    void display_save_message();
+
 public:
     struct color_pick_result
     {
